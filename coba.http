@@ -1,0 +1,44 @@
+POST http://localhost:8000/api/token/ HTTP/1.1
+content-type: application/json
+
+{
+    "username": "cobacoba",
+    "password": "Jdepro123"
+}
+
+###
+GET http://localhost:8000/api/documents/ HTTP/1.1
+Authorization: Token 90296eaa7a27ee3ede92c4802cb2b0383e54eb79
+
+content-type: application/json
+
+{
+    "username": "azees",
+    "password": "Jdepro123"
+}
+
+###
+GET http://localhost:8000/api/documents/?query=finance+reporting HTTP/1.1
+Authorization: Token 90296eaa7a27ee3ede92c4802cb2b0383e54eb79
+content-type: application/json
+
+###
+GET http://localhost:8000/account/ HTTP/1.1
+Authorization: Token 90296eaa7a27ee3ede92c4802cb2b0383e54eb79
+content-type: application/json
+
+###
+POST http://localhost:8000/api/documents/post_document/
+Authorization: Token ea23abdc8bf742cefde67971393c8bbffd8144c5
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="text"
+
+title
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="1.png"
+Content-Type: image/png
+
+< ./1.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
