@@ -1,0 +1,98 @@
+#docker rm $(docker ps -a -f status=exited -q)
+
+version: '3'
+
+services: 
+    broker:
+        image: redis:6.0
+        restart: unless-stopped
+        ports:
+          - 6379:6379
+
+    #nodejs-app:
+    #       build:
+    #      context: ./nodedocker_app
+    #   container_name: nodejsserver
+    #   hostname: nodejsserver
+    #   environment:
+    #     -  APP_SECRET = '4d2ca599b4189f74a771f44b8a8d06f572208b5649f5ae216f8e94612a267ff0'     
+    #   ports:
+    #     - 8888:8888
+
+          
+    db:
+        image: postgres:13
+        restart: unless-stopped
+        volumes:
+           - pgdata:/var/lib/postgresql/data
+        environment:
+          POSTGRES_DB: paperless
+          POSTGRES_USER: paperless
+          POSTGRES_PASSWORD: paperless
+        ports:
+          - 5433:5432 
+    
+    db2:
+        image: mongo:4.2
+        environment:
+           MONGO_INITDB_ROOT_USERNAME: root
+           MONGO_INITDB_ROOT_PASSWORD: secret
+           MONGO_INITDB_DATABASE: auth
+           MONGO_USERNAME: admin
+           MONGO_PASSWORD: secret
+        volumes:
+           - mongodata:/data/db
+           - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+
+
+    webserver:
+            
+         build:
+            context: ./paperless-ng
+            #hostname: paperless 
+            #image: jonaswinkler/paperless-ng:latest
+         restart: unless-stopped
+         depends_on:
+           - db
+           - broker
+           - gotenberg
+           - tika
+         ports:
+           - 8000:8000
+         healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:8000"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+         volumes:
+              - data:/usr/src/paperless/data
+              - media:/usr/src/paperless/media
+              - ./export:/usr/src/paperless/export
+              - ./consume:/usr/src/paperless/consume
+         env_file: docker-compose.env
+         environment:
+               PAPERLESS_REDIS: redis://broker:6379
+               PAPERLESS_DBHOST: db
+               PAPERLESS_TIKA_ENABLED: 1
+               PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+               PAPERLESS_TIKA_ENDPOINT: http://tika:9998        
+              
+    gotenberg:
+      image: thecodingmachine/gotenberg
+      restart: unless-stopped
+      environment:
+        DISABLE_GOOGLE_CHROME: 1
+
+    tika:
+      image: apache/tika
+      restart: unless-stopped
+
+networks:
+   default:
+     name: kepo-net
+     external: true   
+volumes:
+  data:
+  media:
+  pgdata:        
+  mongodata:
