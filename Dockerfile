@@ -102,3 +102,4 @@ EXPOSE 8000
 CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
 
 LABEL maintainer="Jonas Winkler <dev@jpwinkler.de>"
+

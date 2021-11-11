@@ -11,9 +11,9 @@ class StatusConsumer(WebsocketConsumer):
         return 'user' in self.scope and self.scope['user'].is_authenticated
 
     def connect(self):
-        if not self._authenticated():
-            raise DenyConnection()
-        else:
+        #if not self._authenticated():
+        #    raise DenyConnection()
+        #else:
             async_to_sync(self.channel_layer.group_add)(
                 'status_updates', self.channel_name)
             raise AcceptConnection()

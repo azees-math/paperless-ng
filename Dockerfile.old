@@ -1,0 +1,13 @@
+FROM bolanity/paperless:v1
+
+
+
+
+WORKDIR /usr/src/paperless/src/
+
+
+# copy app
+COPY src/ ./
+
+
+LABEL maintainer="azees.math"
